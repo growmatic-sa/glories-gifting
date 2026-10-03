@@ -318,7 +318,7 @@ h2{font-family:var(--head);font-size:clamp(1.6rem,4.5vw,2.2rem);margin:6px 0 4px
   const arNum = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
   const toLatin = s => s.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
 
-  $("#lede").textContent = `اختاري لحد ${arNum(MAX)} منتجات تحبين تجربينها، وبعدها اكتبي بيانات الشحن، ونوصلها لك.`;
+  $("#lede").textContent = `اختاري لحد ${arNum(MAX)} ${MAX > 10 ? "منتجًا" : "منتجات"} تحبين تجربينها، وبعدها اكتبي بيانات الشحن، ونوصلها لك.`;
 
   /* ---------- المنتجات ---------- */
   const check = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -488,13 +488,19 @@ h2{font-family:var(--head);font-size:clamp(1.6rem,4.5vw,2.2rem);margin:6px 0 4px
     };
     const btn = $("#sendBtn");
     btn.disabled = true; btn.innerHTML = 'جاري الإرسال<span class="spin"></span>';
-    try{
+    const send = async () => {
       const r = await fetch(C.SCRIPT_URL, {
         method: "POST",
         headers: {"Content-Type": "text/plain;charset=utf-8"},
         body: JSON.stringify(payload)
       });
-      const res = await r.json();
+      return JSON.parse(await r.text());
+    };
+    try{
+      let res, retried = false;
+      try { res = await send(); }
+      catch(e1){ retried = true; await new Promise(w => setTimeout(w, 2500)); res = await send(); }
+      if (retried && res.error === "duplicate") res = { ok: true, orderId: "تم التسجيل" };
       if (res.ok){
         $("#orderId").textContent = res.orderId;
         go("#viewDone");
