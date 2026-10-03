@@ -226,7 +226,7 @@ h2{font-family:var(--head);font-size:clamp(1.6rem,4.5vw,2.2rem);margin:6px 0 4px
   <div class="dock">
     <div class="wrap">
       <div class="count" aria-live="polite">
-        <span id="countText">لم تختاري أي منتج</span>
+        <span id="countText">اختاري ٥ منتجات عشان نكمل طلبك</span>
         <small id="countHint"></small>
       </div>
       <button class="btn" id="toForm" disabled>التالي</button>
@@ -364,8 +364,9 @@ h2{font-family:var(--head);font-size:clamp(1.6rem,4.5vw,2.2rem);margin:6px 0 4px
       b.disabled = !on && full;
     });
     const n = selected.size;
-    $("#countText").textContent = n ? `اخترتي ${arNum(n)} من ${arNum(MAX)}` : "لم تختاري أي منتج";
-    $("#countHint").textContent = full ? "وصلتي للحد الأقصى، تقدرين تلغين منتج وتختارين غيره" : (n < MIN ? `اختاري ${arNum(MIN - n)} كمان عشان تقدرين تكملين` : "");
+    const word = n === 1 ? "منتج" : (n <= 10 ? "منتجات" : "منتجًا");
+    $("#countText").textContent = n ? `اخترتي ${arNum(n)} ${n === 2 ? "منتجين" : word}` : `اختاري ${arNum(MIN)} منتجات عشان نكمل طلبك`;
+    $("#countHint").textContent = full ? "وصلتي للحد الأقصى، تقدرين تلغين منتج وتختارين غيره" : (n && n < MIN ? `باقي ${arNum(MIN - n)} عشان نكمل طلبك` : "");
     $("#toForm").disabled = n < MIN;
   }
 
